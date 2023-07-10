@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Client } from 'pg';
 
 import { v4 } from 'uuid';
 
@@ -6,23 +7,53 @@ import { User } from '../models';
 
 @Injectable()
 export class UsersService {
-  private readonly users: Record<string, User>;
+  async findOne(name: string): Promise<User>{
+    const client = new Client();
+    await client.connect();
 
-  constructor() {
-    this.users = {}
+    try {
+      const result = await client.query({
+        text: 'SELECT * FROM users WHERE name = $1', 
+        values: [name],
+      });
+
+      if (result['rows'].length === 0) {
+        return undefined;
+      }
+
+      const data = result['rows'][0];
+
+      return {
+        id: data.id,
+        name,
+      }
+    } catch (error) {
+      console.log('DB operation error', error);
+    } finally {
+      client.end();
+    }
   }
 
-  findOne(userId: string): User {
-    return this.users[ userId ];
-  }
+  async createOne({ name }: User): Promise<User> {
+    const client = new Client();
+    await client.connect();
 
-  createOne({ name, password }: User): User {
-    const id = v4();
-    const newUser = { id: name || id, name, password };
+    try {
+      const userId = v4();
+      await client.query({
+        text: 'INSERT INTO users(id, name) VALUES($1, $2)', 
+        values: [userId, name],
+      });
 
-    this.users[ id ] = newUser;
-
-    return newUser;
+      return {
+        id: userId,
+        name,
+      }
+    } catch (error) {
+      console.log('DB operation error', error);
+    } finally {
+      client.end();
+    }
   }
 
 }
