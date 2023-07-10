@@ -22,7 +22,7 @@ END;
 $$ language 'plpgsql';
 
 CREATE TRIGGER after_cart_update
-  AFTER UPDATE ON carts
+  BEFORE UPDATE ON carts
   FOR EACH ROW
     EXECUTE PROCEDURE update_updated_at_carts();
 
@@ -39,10 +39,10 @@ CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY,
   user_id UUID NOT NULL,
   cart_id UUID NOT NULL,
-  payment JSON,
-  delivery JSON,
+  payment JSONB,
+  delivery JSONB,
   comments TEXT,
-  status statuses,
+  status TEXT,
   total NUMERIC,
   CONSTRAINT fk_orders_carts
     FOREIGN KEY(cart_id) 
@@ -54,4 +54,5 @@ INSERT INTO users (id, name) VALUES ('06e75a54-4ee8-4254-9ae5-de22e8ba3f88', 'bw
 INSERT INTO carts (id, user_id, status) VALUES ('9e65e095-a037-4686-a002-64b086c23304', '06e75a54-4ee8-4254-9ae5-de22e8ba3f88', 'OPEN');
 INSERT INTO cart_items (cart_id, product_id, count) VALUES ('9e65e095-a037-4686-a002-64b086c23304', '7567ec4b-b10c-48c5-9345-fc73c48a80aa', 1);
 INSERT INTO cart_items (cart_id, product_id, count) VALUES ('9e65e095-a037-4686-a002-64b086c23304', '7567ec4b-b10c-48c5-9345-fc73c48a80a0', 2);
+
 

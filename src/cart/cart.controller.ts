@@ -54,7 +54,6 @@ export class CartController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard)
   @UseGuards(BasicAuthGuard)
   @Post('checkout')
   async checkout(@Req() req: AppRequest, @Body() body) {
@@ -73,15 +72,14 @@ export class CartController {
 
     const { id: cartId, items } = cart;
     const total = calculateCartTotal(cart);
-    const order = this.orderService.create({
+    const order = await this.orderService.create({
       ...body, // TODO: validate and pick only necessary data
       userId,
       cartId,
       items,
       total,
     });
-    this.cartService.removeByUserId(userId);
-
+  
     return {
       statusCode: HttpStatus.OK,
       message: 'OK',
