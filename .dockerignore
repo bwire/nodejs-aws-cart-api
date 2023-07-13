@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+**/scripts
+**/cdk.out
+**/.vscode
+
+.git
+npm-debug.log
+.env
