@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { Client } from 'pg';
 import { Order } from '../models';
-import { CartService } from 'src/cart';
+import { CartService, OrderStatus } from 'src/cart';
 
 @Injectable()
 export class OrderService {
@@ -89,12 +89,12 @@ export class OrderService {
       const result = await client.query({
         text: 'INSERT INTO orders (id, user_id, cart_id, delivery, comments, status, total) \
               VALUES($1, $2, $3, $4, $5, $6, $7)', 
-        values: [orderId, userId, cartId, { type: 'HOME', address: restAddress }, comment, 'ORDERED', total],
+        values: [orderId, userId, cartId, { type: 'HOME', address: restAddress }, comment, OrderStatus.ORDERED, total],
       });
 
       await client.query({
         text: 'UPDATE carts SET status = $1 WHERE id = $2', 
-        values: ['ORDERED', cartId],
+        values: [OrderStatus.ORDERED, cartId],
       }); 
 
       await client.query('COMMIT');
@@ -105,7 +105,7 @@ export class OrderService {
         cartId,
         items,
         comments: comment,
-        status: 'ORDERED',
+        status: OrderStatus.ORDERED,
         total  
       };
     } catch (error) {
