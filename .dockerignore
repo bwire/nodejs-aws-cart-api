@@ -1,10 +1,18 @@
+# all dependencies will be installed inside the container - no need to copy
 **/node_modules
+# application will be build inside the container - no need to copy
 **/dist
+# just to reduce the container's size - since we don't have CI and a separate step for the testing
 **/test
+# db-script is not required inside the container
 **/scripts
+# we don't use cdk to run the application inside the container
 **/cdk.out
+# this is vscode specific bits - not required
 **/.vscode
-
+# git related bits is not required inside the container
 .git
+# we don't need any logs as well
 npm-debug.log
+# and environment files should be hidden
 .env
