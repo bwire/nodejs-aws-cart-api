@@ -15,6 +15,8 @@ RUN npm run build
 # App
 FROM node:16.15.1-alpine AS app
 
+WORKDIR /app
+
 COPY --from=base /app/package*.json ./
 RUN npm i --only production
 COPY --from=base /app/dist ./dist
