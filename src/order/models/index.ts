@@ -1,16 +1,16 @@
 import { CartItem } from '../../cart/models';
 
 export type Order = {
-  id?: string,
+  id: string,
   userId: string;
   cartId: string;
   items: CartItem[]
-  payment: {
+  payment?: {
     type: string,
     address?: any,
     creditCard?: any,
   },
-  delivery: {
+  delivery?: {
     type: string,
     address: any,
   },
