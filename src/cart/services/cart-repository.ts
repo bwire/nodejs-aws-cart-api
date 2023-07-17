@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import { v4 as uuid } from 'uuid';
-import { Cart } from '../models';
+import { Cart, OrderStatus } from '../models';
 
 export class CartRepository {
   private async getClient(): Promise<Client> {
@@ -16,8 +16,8 @@ export class CartRepository {
       const cartResult = await client.query({
         text: '\
           SELECT id FROM carts \
-          WHERE user_Id = $1',   
-        values: [ userId ]
+          WHERE user_Id = $1 AND status = $2',   
+        values: [ userId, OrderStatus.OPEN ]
       }); 
 
       if (cartResult['rows'].length !== 0) {
@@ -68,7 +68,7 @@ export class CartRepository {
       const cartId = uuid();
       const result = await client.query({ 
         text: queryText, 
-        values: [ cartId, userId, 'OPEN'],
+        values: [ cartId, userId, OrderStatus.OPEN],
       });
 
       return {
@@ -102,12 +102,6 @@ export class CartRepository {
       
       await Promise.all(updatePromises);
       
-      // to invoke update trigger (update updated_at)
-      await client.query({ 
-        text: "UPDATE carts SET status = $1 WHERE id = $2", 
-        values: ['OPEN', cart.id],
-      });
-
       await client.query('COMMIT');
 
       return {...cart, items};
